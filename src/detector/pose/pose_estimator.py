@@ -3,8 +3,8 @@ from typing import List
 import cv2
 
 
-class PoseEstimator:
-    def __int__(self):
+class PoseEstimator(object):
+    def __init__(self):
         self.mp_pose = mp.solutions.pose
         self.mp_draw = mp.solutions.drawing_utils
         self.pose = self.mp_pose.Pose()
@@ -32,7 +32,6 @@ class PoseEstimator:
         Args:
             image:
         """
-
         results = self.pose.process(image)
         return results
 

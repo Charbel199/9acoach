@@ -6,20 +6,20 @@ class HoldsDetector(object):
     def __init__(self):
         pass
 
-    def auto_canny(self, image, sigma=0.5):
-        # compute the median of the single channel pixel intensities
-        v = np.median(image)
-
-        # apply automatic Canny edge detection using the computed median
-        lower = int(max(0, (1.0 - sigma) * v))
-        upper = int(min(255, (1.0 + sigma) * v))
-        edged = cv2.Canny(image, lower, upper)
-
-        # return the edged image
-        return edged
-
-    def detect_holds(self, image):
+    def vision_detect_holds(self, image, lower_area=4500, upper_area=5650, draw_contours=True):
         shifted = cv2.pyrMeanShiftFiltering(image, 12, 20)
-        canny = self.auto_canny(shifted)
+        canny = cv2.Canny(shifted, 80, 80 * 3)
+        processed_img = cv2.GaussianBlur(canny, (5, 5), 0)
+        _, processed_img = cv2.threshold(processed_img, 40, 255, cv2.THRESH_BINARY)
+        # Find contours
+        contours, hierarchy = cv2.findContours(processed_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        for c in contours:
+            area = cv2.contourArea(c)
+            if lower_area < area < upper_area:
+                (x, y, w, h) = cv2.boundingRect(c)
+                if draw_contours:
+                    cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 255), 2)
+        return processed_img
 
-        return canny
+    def ml_detect_holds(self, image):
+        pass

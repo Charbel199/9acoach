@@ -1,6 +1,6 @@
 import cv2
-import numpy as np
-
+from detector.holds.model.yolov4 import Yolov4
+import torch
 
 class HoldsDetector(object):
     def __init__(self):
@@ -22,4 +22,18 @@ class HoldsDetector(object):
         return processed_img
 
     def ml_detect_holds(self, image):
-        pass
+
+        n_classes = ''
+        weightfile = ''
+        imgfile = ''
+        namesfile = ''
+
+
+        model = Yolov4(n_classes=n_classes)
+
+        pretrained_dict = torch.load(weightfile, map_location=torch.device('cuda'))
+        model.load_state_dict(pretrained_dict)
+
+        use_cuda = 1
+        if use_cuda:
+            model.cuda()
